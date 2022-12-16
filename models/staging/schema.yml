@@ -1,0 +1,165 @@
+version: 2
+
+
+sources:
+  - name: shop # required
+    description: This is the raw dataset used for this tutorial
+    database: curious-scarab-309814
+    schema: jaffle_shop
+    tables:
+      - name: raw_customers
+        description: this contains data about athlete events
+        columns:
+          - name: id
+            description: id of the customer
+            tests:
+              - not_null
+              - unique
+      - name: raw_orders
+        description: this contains data about athlete events
+        columns:
+          - name: id
+            description: id of the order made by customers
+            tests:
+              - not_null
+              - unique
+
+      - name: raw_payments
+        description: this contains data about athlete events
+        columns:
+          - name: id
+            description: id of the order made by customers
+            tests:
+              - not_null
+              - unique
+
+models:
+  - name: customers
+    description: This table has basic information about a customer, as well as some derived facts based on a customer's orders
+
+    columns:
+      - name: customer_id
+        description: This is a unique identifier for a customer
+        tests:
+          - unique
+          - not_null
+
+      - name: first_name
+        description: Customer's first name. PII.
+
+      - name: last_name
+        description: Customer's last name. PII.
+
+      - name: first_order
+        description: Date (UTC) of a customer's first order
+
+      - name: most_recent_order
+        description: Date (UTC) of a customer's most recent order
+
+      - name: number_of_orders
+        description: Count of the number of orders a customer has placed
+
+      - name: total_order_amount
+        description: Total value (AUD) of a customer's orders
+
+  - name: orders
+    description: This table has basic information about orders, as well as some derived facts based on payments
+
+    columns:
+      - name: order_id
+        tests:
+          - unique
+          - not_null
+        description: This is a unique identifier for an order
+
+      - name: customer_id
+        description: Foreign key to the customers table
+        tests:
+          - not_null
+          - relationships:
+              to: ref('customers')
+              field: customer_id
+
+      - name: order_date
+        description: Date (UTC) that the order was placed
+
+      - name: status
+        description: '{{ doc("orders_status") }}'
+        tests:
+          - accepted_values:
+              values: ['placed', 'shipped', 'completed', 'return_pending', 'returned']
+
+      - name: amount
+        description: Total amount (AUD) of the order
+        tests:
+          - not_null
+
+      - name: credit_card_amount
+        description: Amount of the order (AUD) paid for by credit card
+        tests:
+          - not_null
+
+      - name: coupon_amount
+        description: Amount of the order (AUD) paid for by coupon
+        tests:
+          - not_null
+
+      - name: bank_transfer_amount
+        description: Amount of the order (AUD) paid for by bank transfer
+        tests:
+          - not_null
+
+      - name: gift_card_amount
+        description: Amount of the order (AUD) paid for by gift card
+        tests:
+          - not_null
+
+
+exposures:
+
+  - name: customer_metrics
+    type: dashboard
+    maturity: high
+    url: https://bi.tool/dashboards/1
+    description: >
+      Shows description of customer activities?
+
+    depends_on:
+      - ref('stg_orders')
+      - ref('stg_customers')
+
+
+    owner:
+      name: David
+      email: data@jaffleshop.com
+
+
+models:
+  - name: stg_customers
+    columns:
+      - name: customer_id
+        tests:
+          - unique
+          - not_null
+
+  - name: stg_orders
+    columns:
+      - name: order_id
+        tests:
+          - unique
+          - not_null
+      - name: status
+        tests:
+          - accepted_values:
+              values: ['placed', 'shipped', 'completed', 'return_pending', 'returned']
+
+  - name: stg_payments
+    columns:
+      - name: payment_id
+        tests:
+          - unique
+          - not_null
+      - name: payment_method
+        tests:
+          - accepted_values:
+              values: ['credit_card', 'coupon', 'bank_transfer', 'gift_card']
