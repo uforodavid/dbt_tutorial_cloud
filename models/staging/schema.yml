@@ -114,26 +114,6 @@ models:
         tests:
           - not_null
 
-
-exposures:
-
-  - name: customer_metrics
-    type: dashboard
-    maturity: high
-    url: https://bi.tool/dashboards/1
-    description: >
-      Shows description of customer activities?
-
-    depends_on:
-      - ref('stg_orders')
-      - ref('stg_customers')
-
-
-    owner:
-      name: David
-      email: data@jaffleshop.com
-
-
 models:
   - name: stg_customers
     columns:
