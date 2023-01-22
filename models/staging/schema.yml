@@ -92,3 +92,18 @@ models:
           - accepted_values:
               values: ['credit_card', 'coupon', 'bank_transfer', 'gift_card']
 
+exposures:
+
+  - name: orders_pivot_dashboard
+    type: dashboard
+    maturity: high
+    url: https://bi.tool/dashboards/1
+    description: >
+      This dashboard is used by operations team.
+
+    depends_on:
+      - ref('stg_payments')
+
+    owner:
+      name: David_Data
+      email: david@david_data.com
