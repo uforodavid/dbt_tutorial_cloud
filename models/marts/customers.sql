@@ -1,5 +1,5 @@
 
-{{ config(materialized='table', dist='customer_id') }}
+
 
 
 with customers as (

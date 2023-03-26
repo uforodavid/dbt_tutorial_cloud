@@ -37,10 +37,12 @@ models:
     staging:
       +enabled: true
       +materialized: view
+      +schema: staging
 
-    mart:
+    marts:
       +enabled: true
       +materialized: table
+      +schema: analytics
       
       exposures:
         +enabled: false
